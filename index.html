@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    #header {
+      background-color: #6772e5;
+      padding: 20px;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #header h1 {
+      font-size: 36px;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    #menu {
+      font-size: 24px;
+    }
+
+    #content {
+      padding: 20px;
+    }
+
+    .separator {
+      border-top: 1px solid #000000;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .button {
+      background-color: #6772e5;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      opacity: 0.8;
+    }
+    .small-button{
+        font-size: 8px;
+    }
+
+    .examples-content {
+      display: none;
+    }
+    .param-content {
+      display: none;
+    }
+    #design-menu{
+      display: none;
+    }
+    #table-container{
+      display: none;
+    }
+    .option-content{
+      display: none;
+    }
+    
+    .center-button {
+        text-align: left;
+        display: block;
+        /* margin: 0 auto; */
+    }
+   
+    
+    .option-checkbox {
+      
+      margin-bottom: 10px;
+    }
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        color: #000000;
+        padding: 10px;
+        text-align: left;
+    }
+    .sequence-segment {
+            font-family: monospace;
+            white-space: pre;
+        }
+
+        .siRNA-box {
+            display: inline-block;
+            width: 100px;
+            height: 20px;
+            border: 1px solid black;
+            position: relative;
+        }
+
+        .siRNA-info {
+            display: none;
+            position: absolute;
+            top: 25px;
+            left: 0;
+            padding: 5px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            z-index: 1;
+        }
+
+        .siRNA-box:hover .siRNA-info {
+            display: block;
+        }
+  </style>
+</head>
+<body>
+  
+  <div id="header">
+    <h1>siSCANNER
+    </h1>
+    <div id="menu">
+      <a href="#" onclick="openDesignMenu()">Design</a>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id = "init">
+      <h3>siSCANNER is a web platform that helps design siRNA easily.</h3>
+      <div style="white-space: pre;">
+step1 : put accesion of your mRNA and click the button or input your mRNA sequence in textarea for mRNA sequence.
+step2 : click submit button
+step3 : now you can get siRNA candidates and those position
+
+(Optional)
+step2-1 : If necessary, click the Option button and change rules for designing
+step2-2 : If necessary, click the Parameter button and change parameters for designing
+
+now, you are ready!
+      </div>
+      
+      <button class="button center-button" onclick="openDesignMenu()">Design siRNA</button>
+    </div>
+    <div id="table-container" class="table-container">
+      <button class="button center-button" onclick="openDesignMenu()">Redesign siRNA</button>
+    </div>
+    
+    <div id="design-menu" class="design-menu">
+      <h2>Design siRNA</h2>
+      <br>
+      <label for="seq_name"> - Sequence Name :</label>
+      <input type="text" id="seq_name" value = "NM_000546.5" placeholder="NM_000546.5">
+      <button id="find_mRNA">find mRNA sequence from NCBI</button>
+      <br><br>
+      <label for="mRNA_seq"> - input mRNA sequence</label><br>
+      
+      <textarea id="mRNA_seq" value = "" placeholder="mRNA sequence" rows = "20" cols = '100'></textarea>
+      <br>
+      <button class="button" onclick="openOptions()">Options</button>
+      <button class = 'button' id="submit" onclick = "openTable()" > submit</button>
+    
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <script src="converter.js"></script>
+    </div>
+    
+    <div id="option-content" class="option-content" style="display: none;">
+        <h2>Options</h2>
+      <div class="option-checkbox ">
+        <input type="checkbox" id="option1" name="option1" value="1" checked>
+        <label for="option1">A or U residues at nucleotide position 1</label>
+      </div>
+      <div class="option-checkbox">
+        <input type="checkbox" id="option2" name="option2" value="1" checked>
+        <label for="option2">4 - 7 A or Us in nucleotide positions 1-7 (AU >= 57%)</label>
+      </div>
+      <div class="option-checkbox">
+        <input type="checkbox" id="option3" name="option3" value="1" checked>
+        <label for="option3">G or C at position 19</label>
+        </div>
+        <div class="option-checkbox">
+        <input type="checkbox" id="option4" name="option4" value="1" checked>
+        <label for="option4">No long GC stretch (<10)</label>
+        </div>
+        <br>
+        <button class="button small-button" onclick="submitOptions()" >Submit</button>
+        <button class="button small-button" onclick="settingParameter()">Setting Parameter</button>
+        
+    </div>
+
+      <div id="param-content" class="param-content" style="display: none;">
+        <h2>Setting Parameter</h2>
+        <label for="param1"> - A or U on position 1 </label>
+        <textarea id="param1" rows = "1" cols = '2'>3</textarea>
+        <br>
+        <label for="param2"> - AU rich on position 1 to 7 </label>
+        <textarea id="param2" rows = "1" cols = '2'>1</textarea>
+        <br>
+        <label for="param3"> - G or C on postion 19 :</label>
+        <textarea id="param3" rows = "1" cols = '2'>2</textarea>
+        <br>
+        <label for="param4"> - GC contents on all postion :</label>
+        <textarea id="param4" rows = "1" cols = '2'>-2</textarea>
+        <br>
+        <label for="param5"> - A or U on position 1 :</label>
+        <textarea id="param5" rows = "1" cols = '2'>21</textarea>
+        <br>
+        <button class="button small-button" onclick="submitParams()" >Submit Parameter</button>
+      </div>
+
+      
+
+    <div id="examples-content" class="examples-content">
+      <h2>Examples</h2>
+      <button class="button" onclick="loadExampleContent()">Load Example Content</button>
+      <div id="example-sequence-content"></div>
+    </div>
+
+    <div id="reference-sequence"></div>
+    <div id = "siRNA-positions"></div>
+
+
+    <br>
+    <div class="footer">
+        <p>Developed by Seojun Noh  (Jkim Lab Capstone Design Project)</p>
+      </div>
+    
+
+    <script>
+      var rule = '1111'
+      var p1 = '3'
+      var p1_7 = '1'
+      var p19 = '2'
+      var GCcontents = '-2'
+      var siRNAlen = '21'
+      function openDesignMenu() {
+
+        document.getElementById('init').style.display = 'none';
+        document.getElementById('design-menu').style.display = 'block';
+        document.getElementById('examples-content').style.display = 'none';
+      }
+      function submitsiRNA() {
+        
+        document.getElementById('init').style.display = 'none';
+        document.getElementById('design-menu').style.display = 'block';
+        document.getElementById('examples-content').style.display = 'none';
+      }
+      function openTable() {
+        
+        document.getElementById('init').style.display = 'none';
+        document.getElementById('design-menu').style.display = 'none';
+        document.getElementById('examples-content').style.display = 'none';
+        document.getElementById('table-container').style.display = 'block';
+      }
+
+      function showExamples() {
+        document.getElementById('init').style.display = 'none';
+        document.getElementById('examples-content').style.display = 'block';
+        document.getElementById('design-menu').style.display = 'none';
+
+      }
+      function openOptions() {
+        var optionsCont = document.getElementById('option-content');
+        if (optionsCont.style.display === 'block'){
+          optionsCont.style.display = 'none';
+        }else if(optionsCont.style.display === 'none'){
+          optionsCont.style.display = 'block'
+        }
+        
+      }
+
+      function settingParameter() {
+        var paramCont = document.getElementById('param-content');
+        if (paramCont.style.display === 'block'){
+          paramCont.style.display = 'none';
+        }else{
+          paramCont.style.display = 'block'
+        }
+      }
+      function loadExampleContent() {
+        const exampleSequence = "Example sequence content goes here.";
+        document.getElementById('example-sequence-content').textContent = exampleSequence;
+      }
+      function submitParams(){
+        document.getElementById('param-content').style.display = 'none';
+        p1 = document.getElementById('param1').value;
+        p1_7 = document.getElementById('param2').value;
+        p19 = document.getElementById('param3').value;
+        GCcontents = document.getElementById('param4').value;
+        siRNAlen = document.getElementById('param5').value;
+        console.log(p1+' '+p1_7+' '+p19+' '+GCcontents+' '+siRNAlen)
+      }
+      
+      function submitOptions() {
+
+      var option1Checked = document.getElementById('option1').checked;
+      var option2Checked = document.getElementById('option2').checked;
+      var option3Checked = document.getElementById('option3').checked;
+      var option4Checked = document.getElementById('option4').checked;
+      document.getElementById('option-content').style.display = 'none';
+
+      rule = ''
+      rule += option1Checked ? "1" : "0";
+      rule += option2Checked ? "1" : "0";
+      rule += option3Checked ? "1" : "0";
+      rule += option4Checked ? "1" : "0";
+
+      console.log("Rule:", rule);
+      }
+      function generateSequenceHTML(reference_seq, siRNA_positions) {
+            var num_segments = Math.floor(reference_seq.length / 100);
+            var remainder = reference_seq.length % 100;
+
+            var segments = [];
+            for (var i = 0; i < num_segments; i++) {
+                segments.push(reference_seq.slice(i*100, (i+1)*100));
+            }
+            if (remainder > 0) {
+                segments.push(reference_seq.slice(num_segments*100));
+            }
+
+            var html = '';
+            for (var i = 0; i < segments.length; i++) {
+                html += '<div class="sequence-segment">' + segments[i] + '</div>';
+
+                var positionDivs = siRNA_positions.filter(function(pos) {
+                    return pos[0] === i;
+                }).map(function(pos) {
+                    return positionBox(pos[0],pos[1], pos[2],pos[3],pos[4],pos[5]);
+                });
+
+                positionDivs.forEach(function(div) {
+                    html += '<div class="siRNA-box">';
+                    html += '<div class="siRNA-info">';
+                    html += 'siRNA index: ' + div.getAttribute("data-index") + ', siRNA sequence: ' + div.getAttribute("data-sequence");
+                    html += '</div>';
+                    html += '</div>';
+                });
+
+                positionDivs.forEach(function(div) {
+                    html += div.outerHTML;
+                });
+            }
+
+            return html;
+    }
+
+    
+
+
+    </script>
+  </div>
+</body>
+
+</html>
+
